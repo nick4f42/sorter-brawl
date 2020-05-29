@@ -34,10 +34,11 @@ namespace SorterBrawl.Sorters
             for (int i = left; i < middle; i++)
             {
                 OnFlaggedIndices(this, new FlagList()
-        {
-          new Tuple<int, FlagType>(i, FlagType.Compared),
-          new Tuple<int, FlagType>(middle, FlagType.Pivot)
-        });
+                {
+                    new Tuple<int, FlagType>(i, FlagType.Compared),
+                    new Tuple<int, FlagType>(middle, FlagType.Pivot)
+                });
+
                 if (array[i] > array[middle])
                 {
                     SwapElements(array, i, middle);

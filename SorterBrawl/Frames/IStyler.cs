@@ -19,7 +19,7 @@ namespace SorterBrawl.Frames
           FlagType flagType)
         {
             Color color = Color.Pink;
-            if (flagColors == null || !flagColors.TryGetValue(flagType, out color))
+            if (flagColors is null || !flagColors.TryGetValue(flagType, out color))
                 SorterTheme.defaultFlagColors.TryGetValue(flagType, out color);
 
             return color;

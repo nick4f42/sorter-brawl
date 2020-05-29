@@ -6,23 +6,42 @@ using static System.Math;
 
 namespace SorterBrawl.Audio
 {
-    static class AudioStyle
+    class AudioStyle
     {
         public delegate double AmplPortioner(int i, int samplesPerFrame);
 
-        public static double DefaultPortioner(int i, int samplesPerFrame)
+        public AmplPortioner Portion;
+
+        public AudioStyle(AmplPortioner portioner)
         {
-            return SoftBeep(i, samplesPerFrame);
+            Portion = portioner;
         }
 
-        public static double SoftBeep(int i, int samplesPerFrame)
+        public static AudioStyle DefaultPortioner
         {
-            return Pow((double)i * (samplesPerFrame - i) * 4.0 / (samplesPerFrame * samplesPerFrame), 2.0);
+            get => SoftBeep;
         }
 
-        public static double QuickBeep(int i, int samplesPerFrame)
+        public static AudioStyle SoftBeep
         {
-            return Pow((double)i * (samplesPerFrame - i) * 4.0 / (samplesPerFrame * samplesPerFrame), 6.0);
+            get
+            {
+                return new AudioStyle((int i, int samplesPerFrame) =>
+                {
+                    return Pow((double)i * (samplesPerFrame - i) * 4.0 / (samplesPerFrame * samplesPerFrame), 2.0);
+                });
+            }
+        }
+
+        public static AudioStyle QuickBeep
+        {
+            get
+            {
+                return new AudioStyle((int i, int samplesPerFrame) =>
+                {
+                    return Pow((double)i * (samplesPerFrame - i) * 4.0 / (samplesPerFrame * samplesPerFrame), 6.0);
+                });
+            }
         }
     }
 }

@@ -46,8 +46,6 @@ namespace SorterBrawl
 
             public abstract void UpdateFrame(Sorter sender, FlagList flagList);
 
-            protected abstract void SaveFrame(Sorter sender, FlagList flagList);
-
             public abstract void Finish();
 
             public abstract bool HasCompleted();
@@ -57,15 +55,15 @@ namespace SorterBrawl
         {
             string imagePath;
 
-            FrameProfile profile;
+            readonly Profile profile;
 
-            Bitmap bitmap;
+            readonly Bitmap bitmap;
 
-            Graphics graphics;
+            readonly Graphics graphics;
 
-            Dictionary<int, FlagData> indexFlags = new Dictionary<int, FlagData>();
+            readonly Dictionary<int, FlagData> indexFlags = new Dictionary<int, FlagData>();
 
-            public FrameMaker(string savePath, FrameProfile profile, int[] array)
+            public FrameMaker(string savePath, Profile profile, int[] array)
               : base(savePath, array)
             {
                 imagePath = savePath + @"\images";
@@ -73,39 +71,39 @@ namespace SorterBrawl
 
                 this.profile = profile;
 
-                bitmap = new Bitmap(profile.Width, profile.Height);
+                bitmap = new Bitmap(profile.Frames.Width, profile.Frames.Height);
                 graphics = Graphics.FromImage(bitmap);
             }
 
             public override void UpdateFrame(Sorter sender, FlagList flagList)
             {
-                profile.Styler.Clear(graphics);
+                lock (array) lock (graphics) lock (bitmap)
+                {
+                    if (ComparisonCount++ % profile.FrameCountDownscale != 0)
+                        return;
 
-                lock (array)
-                    lock (bitmap)
-                        lock (graphics)
-                        {
-                            for (int i = 0; i < array.Length; i++)
-                            {
-                                FlagData flagData;
-                                lock (indexFlags)
-                                    indexFlags.TryGetValue(i, out flagData);
+                    profile.Frames.Styler.Clear(graphics);
 
-                                DrawData data = new DrawData(graphics, flagData.sorter, profile.Width, profile.Height, i,
-                                  array.Length, array[i], minValue, maxValue, flagData.flagType);
+                    UpdateIndexFlags(sender, flagList);
 
-                                profile.Styler.DrawElement(data);
-                            }
+                    for (int i = 0; i < array.Length; i++)
+                    {
+                        FlagData flagData;
+                        lock (indexFlags)
+                            indexFlags.TryGetValue(i, out flagData);
 
-                            if (ComparisonCount++ % profile.FrameCountDownscale == 0)
-                            {
-                                UpdateIndexFlags(sender, flagList);
-                                SaveFrame(sender, flagList);
-                            }
-                        }
+                        DrawData data = new DrawData(graphics, flagData.sorter, profile.Frames, i,
+                            array.Length, array[i], minValue, maxValue, flagData.flagType);
+
+                        profile.Frames.Styler.DrawElement(data);
+                    }
+
+                }
+
+                SaveFrame();
             }
 
-            protected override void SaveFrame(Sorter sender, FlagList flagList)
+            void SaveFrame()
             {
                 lock (bitmap)
                     bitmap.Save(imagePath + @$"\frame_{++FrameCount}.png", ImageFormat.Png);
@@ -142,28 +140,28 @@ namespace SorterBrawl
 
         private class AudioMaker : Maker
         {
-            AudioProfile profile;
-
             string wavFilePath;
 
             const string wavFileName = "audio.wav";
 
-            FileStream stream;
+            readonly Profile profile;
 
-            BinaryWriter writer;
+            readonly FileStream stream;
+
+            readonly BinaryWriter writer;
 
             int samplesPerFrame;
 
             const int SamplesPerSecond = 44100;
 
-            public AudioMaker(string savePath, AudioProfile profile, int[] array)
+            public AudioMaker(string savePath, Profile profile, int[] array)
               : base(savePath, array)
             {
                 this.profile = profile;
 
                 wavFilePath = savePath + '\\' + wavFileName;
 
-                samplesPerFrame = SamplesPerSecond / profile.FramesPerSecond;
+                samplesPerFrame = SamplesPerSecond / profile.Audio.FramesPerSecond;
 
                 stream = new FileStream(wavFilePath, FileMode.Create);
                 writer = new BinaryWriter(stream);
@@ -173,11 +171,14 @@ namespace SorterBrawl
 
             public override void UpdateFrame(Sorter sender, FlagList flagList)
             {
-                if (ComparisonCount++ % profile.FrameCountDownscale == 0)
-                    SaveFrame(sender, flagList);
+                lock (writer)
+                    if (ComparisonCount++ % profile.FrameCountDownscale != 0)
+                        return;
+
+                SaveFrame(flagList);
             }
 
-            protected override void SaveFrame(Sorter sender, FlagList flagList)
+            void SaveFrame(FlagList flagList)
             {
                 for (int i = 0; i < samplesPerFrame; i++)
                 {
@@ -188,13 +189,12 @@ namespace SorterBrawl
                         if (flag.Item1 < 0 || flag.Item1 >= array.Length)
                             continue;
 
-                        double amplFraction = profile.AmplitudePortion(i, samplesPerFrame);
+                        double amplFraction = profile.Audio.Style.Portion(i, samplesPerFrame);
 
-                        // TODO: Parameterize this
                         double freq = ExponentialMap(1.005, array[flag.Item1], minValue, maxValue,
-                          profile.MinFrequency, profile.MaxFrequency);
+                          profile.Audio.MinFrequency, profile.Audio.MaxFrequency);
 
-                        s += (short)(profile.Amplitude * amplFraction * Sin(t * freq * 2.0 * PI));
+                        s += (short)(profile.Audio.Amplitude * amplFraction * Sin(t * freq * 2.0 * PI));
                     }
 
                     lock (writer)
@@ -211,7 +211,7 @@ namespace SorterBrawl
 
                 byte[] wavBytes = File.ReadAllBytes(wavFilePath);
 
-                double duration = (double)FrameCount / profile.FramesPerSecond;
+                double duration = (double)FrameCount / profile.Audio.FramesPerSecond;
 
                 GetWavHeaderBytes(duration).CopyTo(wavBytes);
 
@@ -220,7 +220,7 @@ namespace SorterBrawl
 
             public override bool HasCompleted()
             {
-                throw new NotImplementedException();
+                return FrameCount >= profile.FrameLimit;
             }
 
             static List<byte> GetWavHeaderBytes(double duration)

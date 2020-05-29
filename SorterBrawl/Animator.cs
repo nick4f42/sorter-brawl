@@ -7,6 +7,8 @@ using System.Linq;
 using SorterBrawl.Sorters;
 using SorterBrawl.Audio;
 using SorterBrawl.Frames;
+using System.Runtime.InteropServices.ComTypes;
+using System.Runtime.InteropServices;
 
 namespace SorterBrawl
 {
@@ -40,9 +42,9 @@ namespace SorterBrawl
         readonly bool[] finished = new bool[1];
 
         /// <summary>
-        /// Stores each sorter's amount of turns in sorting the array.
+        /// Stores the index of the sorter who will make the next move.
         /// </summary>
-        Dictionary<Sorter, int> sortersTurnCount;
+        readonly int[] currentSorter = new int[1];
 
         /// <summary>
         /// Constructs Animator.
@@ -113,16 +115,16 @@ namespace SorterBrawl
             array = CopyTemplateArray();
 
             if (profile.Frames != null)
-                frameMaker = new FrameMaker(animationPath, profile.Frames, array);
+                frameMaker = new FrameMaker(animationPath, profile, array);
             else
                 frameMaker = null;
 
             if (profile.Audio != null)
-                audioMaker = new AudioMaker(animationPath, profile.Audio, array);
+                audioMaker = new AudioMaker(animationPath, profile, array);
             else
                 audioMaker = null;
 
-            sortersTurnCount = Sorters.ToDictionary(Sorter => Sorter, Sorter => 0);
+            currentSorter[0] = 0;
 
             finished[0] = false;
         }
@@ -132,19 +134,34 @@ namespace SorterBrawl
         /// </summary>
         void SorterFlagHandler(Sorter sender, FlagList flagList)
         {
-            if (finished[0])
-                return;
-
-            lock (sortersTurnCount)
-                sortersTurnCount[sender]++;
+            lock (finished)
+            {
+                if (finished[0])
+                    return;
+                else if ((frameMaker?.HasCompleted() ?? false) || (audioMaker?.HasCompleted() ?? false))
+                {
+                    finished[0] = true;
+                    return;
+                }
+            }
 
             frameMaker?.UpdateFrame(sender, flagList);
             audioMaker?.UpdateFrame(sender, flagList);
 
+            int index;
+            lock (currentSorter)
+            {
+                index = currentSorter[0];
+                if (currentSorter[0] == Sorters.Length - 1)
+                    currentSorter[0] = 0;
+                else
+                    currentSorter[0]++;
+            }
+
             SpinWait.SpinUntil(() =>
             {
-                lock (sortersTurnCount)
-                    return sortersTurnCount.Values.Min() >= sortersTurnCount[sender];
+                lock (currentSorter)
+                    return currentSorter[0] == index;
             }, 10);
         }
 

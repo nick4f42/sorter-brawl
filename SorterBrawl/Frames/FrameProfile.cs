@@ -12,9 +12,5 @@ namespace SorterBrawl.Frames
         public int Height { get; set; }
 
         public IStyler Styler { get; set; } = new BarStyler();
-
-        public int FrameLimit { get; set; } = 1_000;
-
-        public int FrameCountDownscale { get; set; } = 1;
     }
 }

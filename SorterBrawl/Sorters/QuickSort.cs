@@ -36,11 +36,12 @@ namespace SorterBrawl.Sorters
             for (int j = left; j < right - 1; j++)
             {
                 OnFlaggedIndices(this, new FlagList()
-        {
-          new Tuple<int, FlagType>(j, FlagType.Compared),
-          new Tuple<int, FlagType>(i, FlagType.Compared),
-          new Tuple<int, FlagType>(right - 1, FlagType.Pivot)
-        });
+                {
+                    new Tuple<int, FlagType>(j, FlagType.Compared),
+                    new Tuple<int, FlagType>(i, FlagType.Compared),
+                    new Tuple<int, FlagType>(right - 1, FlagType.Pivot)
+                });
+
                 if (array[j] <= array[right - 1])
                 {
                     i++;

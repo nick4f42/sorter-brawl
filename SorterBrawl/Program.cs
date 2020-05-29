@@ -21,10 +21,12 @@ namespace SorterBrawl
             };
 
             var profile = new Profile(new FrameProfile
-            {
-                Width = 500,
-                Height = 500,
-            });
+                {
+                    Width = 500,
+                    Height = 500,
+                },
+                200
+            );
 
             Animator animator = new Animator(array, sorters, profile);
 

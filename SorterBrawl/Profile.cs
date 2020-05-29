@@ -14,14 +14,23 @@ namespace SorterBrawl
         public FrameProfile Frames { get; set; }
         public AudioProfile Audio { get; set; }
 
-        public Profile(FrameProfile frameProfile, AudioProfile audioProfile)
+        public int FrameLimit { get; set; }
+
+        public int FrameCountDownscale { get; set; }
+
+        public Profile(FrameProfile frameProfile, AudioProfile audioProfile,
+            int frameLimit = 1_000, int frameCountDownscale = 1)
         {
             Frames = frameProfile;
             Audio = audioProfile;
+            FrameLimit = frameLimit;
+            FrameCountDownscale = frameCountDownscale;
         }
 
-        public Profile(AudioProfile audioProfile) : this(null, audioProfile) { }
+        public Profile(AudioProfile audioProfile, int frameLimit = 1_000, int frameCountDownscale = 1)
+            : this(null, audioProfile, frameLimit, frameCountDownscale) { }
 
-        public Profile(FrameProfile frameProfile) : this(frameProfile, null) { }
+        public Profile(FrameProfile frameProfile, int frameLimit = 1_000, int frameCountDownscale = 1)
+            : this(frameProfile, null, frameLimit, frameCountDownscale) { }
     }
 }

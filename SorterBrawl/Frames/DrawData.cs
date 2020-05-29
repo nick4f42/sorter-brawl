@@ -9,12 +9,11 @@ namespace SorterBrawl.Frames
 {
     struct DrawData
     {
-        public Graphics graphics;
+        public readonly Graphics graphics;
 
-        public Sorter sorter;
+        public readonly Sorter sorter;
 
-        public readonly int width;
-        public readonly int height;
+        public readonly FrameProfile profile;
 
         public readonly int i;
         public readonly int length;
@@ -25,15 +24,14 @@ namespace SorterBrawl.Frames
 
         public readonly FlagType flagType;
 
-        public DrawData(Graphics graphics, Sorter sorter, int width, int height, int i, int length,
+        public DrawData(Graphics graphics, Sorter sorter, FrameProfile profile, int i, int length,
                         int value, int minValue, int maxValue, FlagType flagType)
         {
             this.graphics = graphics;
 
             this.sorter = sorter;
 
-            this.width = width;
-            this.height = height;
+            this.profile = profile;
 
             this.i = i;
             this.length = length;

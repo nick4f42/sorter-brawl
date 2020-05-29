@@ -20,10 +20,11 @@ namespace SorterBrawl.Sorters
                 for (int j = 0; j < array.Length - 1 - i; j++)
                 {
                     OnFlaggedIndices(this, new FlagList()
-          {
-            new Tuple<int, FlagType>(j, FlagType.Compared),
-            new Tuple<int, FlagType>(j + 1, FlagType.Compared)
-          });
+                    {
+                        new Tuple<int, FlagType>(j, FlagType.Compared),
+                        new Tuple<int, FlagType>(j + 1, FlagType.Compared)
+                    });
+
                     if (array[j] > array[j + 1])
                     {
                         sorted = false;

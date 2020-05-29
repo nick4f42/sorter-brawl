@@ -41,10 +41,7 @@ namespace SorterBrawl.Sorters
 
         protected virtual void OnFlaggedIndices(Sorter sender, FlagList flags)
         {
-            if (FlagIndices == null)
-                return;
-
-            FlagIndices(sender, flags);
+            FlagIndices?.Invoke(sender, flags);
         }
 
         public abstract void Sort(int[] array);
@@ -65,10 +62,10 @@ namespace SorterBrawl.Sorters
                     FlagType flagType = inOrder ? FlagType.SweepCheck : FlagType.SweepFailed;
 
                     OnFlaggedIndices(this, new FlagList()
-          {
-            new Tuple<int, FlagType>(i, flagType),
-            new Tuple<int, FlagType>(i - 1, flagType)
-          });
+                    {
+                        new Tuple<int, FlagType>(i, flagType),
+                        new Tuple<int, FlagType>(i - 1, flagType)
+                    });
 
                     if (!inOrder)
                         return false;
@@ -85,10 +82,10 @@ namespace SorterBrawl.Sorters
                     FlagType flagType = inOrder ? FlagType.SweepCheck : FlagType.SweepFailed;
 
                     OnFlaggedIndices(this, new FlagList()
-          {
-            new Tuple<int, FlagType>(i, flagType),
-            new Tuple<int, FlagType>(i + 1, flagType)
-          });
+                    {
+                        new Tuple<int, FlagType>(i, flagType),
+                        new Tuple<int, FlagType>(i + 1, flagType)
+                    });
 
                     if (!inOrder)
                         return false;
