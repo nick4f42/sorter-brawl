@@ -134,6 +134,14 @@ namespace SorterBrawl
         /// </summary>
         void SorterFlagHandler(Sorter sender, FlagList flagList)
         {
+            int index = Array.FindIndex(Sorters, sorter => sorter == sender);
+
+            SpinWait.SpinUntil(() =>
+            {
+                lock (currentSorter) lock (finished)
+                    return currentSorter[0] == index || finished[0];
+            });
+
             lock (finished)
             {
                 if (finished[0])
@@ -148,21 +156,13 @@ namespace SorterBrawl
             frameMaker?.UpdateFrame(sender, flagList);
             audioMaker?.UpdateFrame(sender, flagList);
 
-            int index;
             lock (currentSorter)
             {
-                index = currentSorter[0];
                 if (currentSorter[0] == Sorters.Length - 1)
                     currentSorter[0] = 0;
                 else
                     currentSorter[0]++;
             }
-
-            SpinWait.SpinUntil(() =>
-            {
-                lock (currentSorter)
-                    return currentSorter[0] == index;
-            }, 10);
         }
 
         /// <summary>

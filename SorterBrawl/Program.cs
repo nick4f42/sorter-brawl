@@ -13,19 +13,22 @@ namespace SorterBrawl
     {
         static void Main(string[] args)
         {
-            int[] array = GetRandomArray(100);
+            int[] array = GetRandomArray(10, seed: 32);
 
             Sorter[] sorters = new Sorter[] {
                 new MergeSort(SorterTheme.Warm),
                 new QuickSortReverse(SorterTheme.Cold)
             };
 
-            var profile = new Profile(new FrameProfile
+            var profile = new Profile(
+                new FrameProfile
                 {
-                    Width = 500,
-                    Height = 500,
+                    Width = 1920,
+                    Height = 1080,
                 },
-                200
+                new AudioProfile { },
+                frameLimit: 50,
+                frameCountDownscale: 1
             );
 
             Animator animator = new Animator(array, sorters, profile);

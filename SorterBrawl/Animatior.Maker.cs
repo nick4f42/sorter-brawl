@@ -79,12 +79,12 @@ namespace SorterBrawl
             {
                 lock (array) lock (graphics) lock (bitmap)
                 {
+                    UpdateIndexFlags(sender, flagList);
+
                     if (ComparisonCount++ % profile.FrameCountDownscale != 0)
                         return;
 
                     profile.Frames.Styler.Clear(graphics);
-
-                    UpdateIndexFlags(sender, flagList);
 
                     for (int i = 0; i < array.Length; i++)
                     {
@@ -124,6 +124,7 @@ namespace SorterBrawl
             {
                 lock (indexFlags)
                 {
+                    // Remove past flags after drawing frame, only add new flags in this method
                     var itemsToRemove = indexFlags.Where(x => x.Value.sorter == sender).ToArray();
                     foreach (var item in itemsToRemove)
                         indexFlags.Remove(item.Key);
@@ -135,6 +136,11 @@ namespace SorterBrawl
                             sorter = sender
                         };
                 }
+            }
+
+            void ClearIndexFlagsBy(Sorter sender)
+            {
+
             }
         }
 
