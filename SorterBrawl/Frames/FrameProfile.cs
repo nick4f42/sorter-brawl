@@ -11,6 +11,6 @@ namespace SorterBrawl.Frames
         public int Width { get; set; }
         public int Height { get; set; }
 
-        public IStyler Styler { get; set; } = new BarStyler();
+        public Styler Styler { get; set; } = new BarStyler();
     }
 }

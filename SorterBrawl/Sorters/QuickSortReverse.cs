@@ -10,16 +10,11 @@ namespace SorterBrawl.Sorters
 
     class QuickSortReverse : Sorter
     {
-        public QuickSortReverse(SorterTheme theme = null) : base(theme) { }
+        public QuickSortReverse(SorterTheme theme = null) : base(theme, true) { }
 
         public override void Sort(int[] array)
         {
             Sort(array, 0, array.Length);
-        }
-
-        public override bool IsSorted(int[] array)
-        {
-            return base.IsSorted(array, reverse: true);
         }
 
         void Sort(int[] array, int left, int right)

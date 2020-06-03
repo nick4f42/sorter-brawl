@@ -9,6 +9,8 @@ using SorterBrawl.Audio;
 using SorterBrawl.Frames;
 using System.Runtime.InteropServices.ComTypes;
 using System.Runtime.InteropServices;
+using System.Diagnostics;
+using System.Drawing;
 
 namespace SorterBrawl
 {
@@ -67,7 +69,7 @@ namespace SorterBrawl
         /// <param name="folderPath">The folder to save the animation to.</param>
         public void SaveAnimation(string folderPath)
         {
-            string animPath = CreateAnimDirectory(folderPath);
+            string animPath = CreateAnimDirectory(folderPath) + @"\";
 
             PrepareNewAnimation(animPath);
 
@@ -90,6 +92,14 @@ namespace SorterBrawl
 
             frameMaker?.Finish();
             audioMaker?.Finish();
+
+            if (frameMaker is object)
+            {
+                if (audioMaker is object)
+                    Process.Start("cmd", $"/C ffmpeg -r {profile.FrameRate} -i {frameMaker.ImagePath}frame_%d.png -i {animPath}{AudioMaker.AudioFileName} -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p -c:a libvo_aacenc {animPath}output.mp4");
+                else
+                    Process.Start("cmd", $"/C ffmpeg -r {profile.FrameRate} -i {frameMaker.ImagePath}frame_%d.png -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p {animPath}output.mp4");
+            }
         }
 
         /// <summary>
@@ -114,12 +124,12 @@ namespace SorterBrawl
         {
             array = CopyTemplateArray();
 
-            if (profile.Frames != null)
+            if (profile.Frames is object)
                 frameMaker = new FrameMaker(animationPath, profile, array);
             else
                 frameMaker = null;
 
-            if (profile.Audio != null)
+            if (profile.Audio is object)
                 audioMaker = new AudioMaker(animationPath, profile, array);
             else
                 audioMaker = null;
@@ -149,12 +159,13 @@ namespace SorterBrawl
                 else if ((frameMaker?.HasCompleted() ?? false) || (audioMaker?.HasCompleted() ?? false))
                 {
                     finished[0] = true;
+                    if (profile.LastFrameBlank) CreateLastBlankFrame();
                     return;
                 }
             }
 
-            frameMaker?.UpdateFrame(sender, flagList);
-            audioMaker?.UpdateFrame(sender, flagList);
+            frameMaker?.Update(sender, flagList);
+            audioMaker?.Update(sender, flagList);
 
             lock (currentSorter)
             {
@@ -173,17 +184,36 @@ namespace SorterBrawl
         {
             while (!finished[0])
             {
-                if (frameMaker != null && frameMaker.HasCompleted())
+                if (frameMaker?.HasCompleted() ?? false)
                     break;
-                if (audioMaker != null && audioMaker.HasCompleted())
+                if (audioMaker?.HasCompleted() ?? false)
                     break;
 
                 sorter.Sort(array);
-                if (sorter.IsSorted(array))
+
+                if (frameMaker?.HasCompleted() ?? false)
                     break;
+                if (audioMaker?.HasCompleted() ?? false)
+                    break;
+
+                if (sorter.IsSorted(array))
+                {
+                    if (profile.LastFrameBlank) CreateLastBlankFrame();
+                    break;
+                }
             }
 
-            finished[0] = true;
+            lock (finished)
+                finished[0] = true;
+        }
+
+        void CreateLastBlankFrame()
+        {
+            frameMaker?.FinalUpdate();
+            audioMaker?.FinalUpdate();
+
+            frameMaker?.Update(Sorters[0], new FlagList());
+            audioMaker?.Update(Sorters[0], new FlagList());
         }
 
         /// <summary>

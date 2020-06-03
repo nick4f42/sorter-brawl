@@ -16,21 +16,34 @@ namespace SorterBrawl
 
         public int FrameLimit { get; set; }
 
+        public float FrameRate { get; set; }
+
+        public int NonBlankFramelimit => FrameLimit - Convert.ToInt32(LastFrameBlank);
+
         public int FrameCountDownscale { get; set; }
 
+        public bool LastFrameBlank { get; set; }
+
         public Profile(FrameProfile frameProfile, AudioProfile audioProfile,
-            int frameLimit = 1_000, int frameCountDownscale = 1)
+            int frameLimit = 1_000, float frameRate = 30, int frameCountDownscale = 1, bool lastFrameBlank = true)
         {
             Frames = frameProfile;
             Audio = audioProfile;
+
             FrameLimit = frameLimit;
+            FrameRate = frameRate;
+
             FrameCountDownscale = frameCountDownscale;
+
+            LastFrameBlank = lastFrameBlank;
         }
 
-        public Profile(AudioProfile audioProfile, int frameLimit = 1_000, int frameCountDownscale = 1)
-            : this(null, audioProfile, frameLimit, frameCountDownscale) { }
+        public Profile(AudioProfile audioProfile, int frameLimit = 1_000, float frameRate = 30,
+                int frameCountDownscale = 1, bool lastFrameBlank = true)
+            : this(null, audioProfile, frameLimit, frameRate, frameCountDownscale, lastFrameBlank) { }
 
-        public Profile(FrameProfile frameProfile, int frameLimit = 1_000, int frameCountDownscale = 1)
-            : this(frameProfile, null, frameLimit, frameCountDownscale) { }
+        public Profile(FrameProfile frameProfile, int frameLimit = 1_000, float frameRate = 30,
+                int frameCountDownscale = 1, bool lastFrameBlank = true)
+            : this(frameProfile, null, frameLimit, frameRate, frameCountDownscale, lastFrameBlank) { }
     }
 }

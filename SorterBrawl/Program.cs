@@ -13,7 +13,7 @@ namespace SorterBrawl
     {
         static void Main(string[] args)
         {
-            int[] array = GetRandomArray(10, seed: 32);
+            int[] array = GetRandomArray(100);
 
             Sorter[] sorters = new Sorter[] {
                 new MergeSort(SorterTheme.Warm),
@@ -25,6 +25,7 @@ namespace SorterBrawl
                 {
                     Width = 1920,
                     Height = 1080,
+                    Styler = new RoundedBarStyler(Color.FromArgb(105, 104, 104), Color.FromArgb(24, 25, 26), 10, 1)
                 },
                 new AudioProfile { },
                 frameLimit: 50,
@@ -33,7 +34,7 @@ namespace SorterBrawl
 
             Animator animator = new Animator(array, sorters, profile);
 
-            string animationsDir = @"..\..\..\Animations";
+            string animationsDir = @"..\..\..\Animations\";
             Directory.CreateDirectory(animationsDir);
 
             animator.SaveAnimation(animationsDir);

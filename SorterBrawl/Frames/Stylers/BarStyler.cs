@@ -7,24 +7,29 @@ using SorterBrawl.Sorters;
 
 namespace SorterBrawl.Frames.Stylers
 {
-    class BarStyler : IStyler
+    class BarStyler : Styler
     {
-        public Color background = Color.Black;
+        public Color Background { get; set; } = Color.Black;
 
         public BarStyler() { }
 
-        public BarStyler(Color background)
+        public BarStyler(Color defaultColor)
+            : base(defaultColor)
+        { }
+
+        public BarStyler(Color defaultColor, Color background)
+            : base(defaultColor)
         {
-            this.background = background;
+            Background = background;
         }
 
-        public void Clear(Graphics graphics)
+        public override void Clear(Graphics graphics)
         {
             lock (graphics)
-                graphics.Clear(background);
+                graphics.Clear(Background);
         }
 
-        public void DrawElement(DrawData data)
+        public override void DrawElement(DrawData data)
         {
             int x = (int)((double)data.i / data.length * data.profile.Width);
 
@@ -33,7 +38,7 @@ namespace SorterBrawl.Frames.Stylers
             int rectHeight = data.profile.Height
                 * (data.value - data.minValue + 1) / (data.maxValue - data.minValue + 1);
 
-            Color color = IStyler.GetFlagColor(data.sorter?.Theme.flagColors, data.flagType);
+            Color color = GetFlagColor(data.sorter?.Theme.flagColors, data.flagType);
 
             lock (data.graphics)
                 data.graphics.FillRectangle(new SolidBrush(color),
