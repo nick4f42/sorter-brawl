@@ -96,9 +96,9 @@ namespace SorterBrawl
             if (frameMaker is object)
             {
                 if (audioMaker is object)
-                    Process.Start("cmd", $"/C ffmpeg -r {profile.FrameRate} -i {frameMaker.ImagePath}frame_%d.png -i {animPath}{AudioMaker.AudioFileName} -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p -c:a libvo_aacenc {animPath}output.mp4");
+                    Process.Start("cmd", $"/C ffmpeg -framerate {profile.FrameRate} -i {frameMaker.ImagePath}frame_%d.png -i {animPath}{AudioMaker.AudioFileName} -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p -c:a libvo_aacenc {animPath}output.mp4");
                 else
-                    Process.Start("cmd", $"/C ffmpeg -r {profile.FrameRate} -i {frameMaker.ImagePath}frame_%d.png -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p {animPath}output.mp4");
+                    Process.Start("cmd", $"/C ffmpeg -framerate {profile.FrameRate} -i {frameMaker.ImagePath}frame_%d.png -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p {animPath}output.mp4");
             }
         }
 
