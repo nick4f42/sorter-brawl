@@ -19,7 +19,6 @@ namespace SorterBrawl
 
             public int ComparisonCount { get; protected set; }
 
-
             protected string savePath;
 
             protected int[] array;

@@ -59,9 +59,9 @@ namespace SorterBrawl.Frames.Stylers
 
         public override void DrawElement(DrawData data)
         {
-            int x = (int)((double)data.i / data.length * data.profile.Width);
+            int x = data.profile.ViewBox.X + (int)((double)data.i / data.length * data.profile.ViewBox.Width);
 
-            int rectWidth = (int)((double)(data.i + 1) / data.length * data.profile.Width) - x;
+            int rectWidth = (int)((double)(data.i + 1) / data.length * data.profile.ViewBox.Width) - x + data.profile.ViewBox.X;
 
             // TODO: Add a cleaner solution for this problem
             //       (rounded radius larger than bar)
@@ -70,7 +70,7 @@ namespace SorterBrawl.Frames.Stylers
                 Radius = rectWidth / 2;
             }
 
-            int rectHeight = data.profile.Height
+            int rectHeight = data.profile.ViewBox.Height
                 * (data.value - data.minValue + 1) / (data.maxValue - data.minValue + 1);
 
             Color color = GetFlagColor(data.sorter?.Theme.flagColors, data.flagType);
@@ -78,15 +78,17 @@ namespace SorterBrawl.Frames.Stylers
             GraphicsPath path = new GraphicsPath();
 
             path.StartFigure();
-            path.AddLine(x, data.profile.Height, x, data.profile.Height - rectHeight + Radius);
+            path.AddLine(x, data.profile.ViewBox.Bottom,
+                         x, data.profile.ViewBox.Bottom - rectHeight + Radius);
 
-            var rect = new Rectangle(x, data.profile.Height - rectHeight, 2 * Radius, 2 * Radius);
+            var rect = new Rectangle(x, data.profile.ViewBox.Bottom - rectHeight, 2 * Radius, 2 * Radius);
             path.AddArc(rect, 180, 90);
 
             rect.X += rectWidth - 2 * Radius;
             path.AddArc(rect, -90, 90);
 
-            path.AddLine(x + rectWidth, data.profile.Height - rectHeight + Radius, x + rectWidth, data.profile.Height);
+            path.AddLine(x + rectWidth, data.profile.ViewBox.Bottom - rectHeight + Radius,
+                         x + rectWidth, data.profile.ViewBox.Bottom);
 
             path.CloseFigure();
 

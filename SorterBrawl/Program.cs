@@ -21,14 +21,10 @@ namespace SorterBrawl
             };
 
             var profile = new Profile(
-                new FrameProfile
-                {
-                    Width = 1920,
-                    Height = 1080,
-                    Styler = new RoundedBarStyler(Color.FromArgb(105, 104, 104), Color.FromArgb(24, 25, 26), 10, 1)
-                },
+                new FrameProfile(1920, 1080, new Rectangle(0, 250, 1920, 1080 - 250), 
+                                 new RoundedBarStyler(Color.FromArgb(105, 104, 104), Color.FromArgb(24, 25, 26), 10, 1)),
                 new AudioProfile { },
-                frameLimit: 50,
+                frameLimit: 30 * 5,
                 frameCountDownscale: 1
             );
 

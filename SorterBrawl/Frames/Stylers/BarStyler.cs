@@ -31,18 +31,20 @@ namespace SorterBrawl.Frames.Stylers
 
         public override void DrawElement(DrawData data)
         {
-            int x = (int)((double)data.i / data.length * data.profile.Width);
+            int x = data.profile.ViewBox.X + (int)((double)data.i / data.length * data.profile.ViewBox.Width);
 
-            int rectWidth = (int)((double)(data.i + 1) / data.length * data.profile.Width) - x;
+            int rectWidth = (int)((double)(data.i + 1) / data.length * data.profile.ViewBox.Width) - x + data.profile.ViewBox.X;
 
-            int rectHeight = data.profile.Height
+            int rectHeight = data.profile.ViewBox.Height
                 * (data.value - data.minValue + 1) / (data.maxValue - data.minValue + 1);
 
             Color color = GetFlagColor(data.sorter?.Theme.flagColors, data.flagType);
 
             lock (data.graphics)
                 data.graphics.FillRectangle(new SolidBrush(color),
-                  new Rectangle(x, data.profile.Height - rectHeight, rectWidth, rectHeight));
+                  new Rectangle(x, 
+                                data.profile.ViewBox.Y + data.profile.ViewBox.Height - rectHeight,
+                                rectWidth, rectHeight));
         }
     }
 }
