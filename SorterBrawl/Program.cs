@@ -6,6 +6,8 @@ using SorterBrawl.Sorters;
 using SorterBrawl.Audio;
 using SorterBrawl.Frames;
 using SorterBrawl.Frames.Stylers;
+using System.Collections.Generic;
+using SorterBrawl.Frames.FrameAddOns;
 
 namespace SorterBrawl
 {
@@ -20,12 +22,15 @@ namespace SorterBrawl
                 new QuickSortReverse(SorterTheme.Cold)
             };
 
+            var addOns = new List<IFrameAddOn> { new ScoreCounter(array, 10, 250, Color.Red, Color.Blue) };
+
             var profile = new Profile(
                 new FrameProfile(1920, 1080, new Rectangle(0, 250, 1920, 1080 - 250), 
-                                 new RoundedBarStyler(Color.FromArgb(105, 104, 104), Color.FromArgb(24, 25, 26), 10, 1)),
+                                 new RoundedBarStyler(Color.FromArgb(105, 104, 104), Color.FromArgb(24, 25, 26), 10, 1),
+                                 addOns),
                 new AudioProfile { },
-                frameLimit: 30 * 5,
-                frameCountDownscale: 1
+                frameLimit: 30 * 60,
+                frameCountDownscale: 4
             );
 
             Animator animator = new Animator(array, sorters, profile);

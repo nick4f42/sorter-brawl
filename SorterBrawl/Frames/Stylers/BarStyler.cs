@@ -9,13 +9,26 @@ namespace SorterBrawl.Frames.Stylers
 {
     class BarStyler : Styler
     {
-        public Color Background { get; set; } = Color.Black;
+        public Color Background
+        {
+            get => background;
+            set
+            {
+                background = value;
+                backgroundBrush = new SolidBrush(background);
+            }
+        }
 
         public BarStyler() { }
 
+        Color background;
+        SolidBrush backgroundBrush;
+
         public BarStyler(Color defaultColor)
             : base(defaultColor)
-        { }
+        {
+            Background = Color.Black;
+        }
 
         public BarStyler(Color defaultColor, Color background)
             : base(defaultColor)
@@ -23,10 +36,10 @@ namespace SorterBrawl.Frames.Stylers
             Background = background;
         }
 
-        public override void Clear(Graphics graphics)
+        public override void Clear(Graphics graphics, FrameProfile profile)
         {
             lock (graphics)
-                graphics.Clear(Background);
+                graphics.FillRectangle(backgroundBrush, profile.ViewBox);
         }
 
         public override void DrawElement(DrawData data)

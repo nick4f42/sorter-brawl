@@ -20,7 +20,7 @@ namespace SorterBrawl.Frames
             DefaultColor = defaultColor;
         }
 
-        public abstract void Clear(Graphics graphics);
+        public abstract void Clear(Graphics graphics, FrameProfile profile);
 
         public abstract void DrawElement(DrawData data);
 

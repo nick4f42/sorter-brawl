@@ -5,6 +5,7 @@ using System.Text;
 using System.Drawing;
 
 using SorterBrawl.Frames.Stylers;
+using SorterBrawl.Frames.FrameAddOns;
 
 namespace SorterBrawl.Frames
 {
@@ -17,7 +18,9 @@ namespace SorterBrawl.Frames
 
         public Styler Styler { get; set; }
 
-        public FrameProfile(int width, int height, Rectangle? viewBox = null, Styler styler = null)
+        public List<IFrameAddOn> AddOns { get; set; }
+
+        public FrameProfile(int width, int height, Rectangle? viewBox = null, Styler styler = null, List<IFrameAddOn> addOns = null)
         {
             Width = width;
             Height = height;
@@ -31,6 +34,11 @@ namespace SorterBrawl.Frames
                 Styler = styler;
             else
                 Styler = new BarStyler();
+
+            if (addOns is object)
+                AddOns = addOns;
+            else
+                AddOns = new List<IFrameAddOn>();
         }
     }
 }

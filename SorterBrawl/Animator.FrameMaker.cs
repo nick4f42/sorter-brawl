@@ -11,6 +11,8 @@ using static System.Math;
 using SorterBrawl.Sorters;
 using SorterBrawl.Audio;
 using SorterBrawl.Frames;
+using SorterBrawl.Frames.FrameAddOns;
+using System.Runtime.CompilerServices;
 
 namespace SorterBrawl
 {
@@ -42,6 +44,13 @@ namespace SorterBrawl
 
                 bitmap = new Bitmap(profile.Frames.Width, profile.Frames.Height);
                 graphics = Graphics.FromImage(bitmap);
+
+                graphics.Clear(Color.Black);
+
+                foreach (var addOn in profile.Frames.AddOns)
+                {
+                    addOn.BeforeDraw(array, graphics, bitmap, FrameCount);
+                }
             }
 
             public override void FinalUpdate()
@@ -60,7 +69,7 @@ namespace SorterBrawl
                             if (!lastUpdate && ComparisonCount++ % profile.FrameCountDownscale != 0)
                                 return;
 
-                            profile.Frames.Styler.Clear(graphics);
+                            profile.Frames.Styler.Clear(graphics, profile.Frames);
 
                             for (int i = 0; i < array.Length; i++)
                             {
@@ -81,8 +90,19 @@ namespace SorterBrawl
 
             void SaveFrame()
             {
+                foreach (var addOn in profile.Frames.AddOns) {
+                    addOn.AfterDraw(array, graphics, bitmap, FrameCount);
+                }
+
                 lock (bitmap)
                     bitmap.Save(ImagePath + @$"frame_{++FrameCount}.png", ImageFormat.Png);
+
+                graphics.Clear(Color.Black);
+
+                foreach (var addOn in profile.Frames.AddOns)
+                {
+                    addOn.BeforeDraw(array, graphics, bitmap, FrameCount);
+                }
             }
 
             public override void Finish()

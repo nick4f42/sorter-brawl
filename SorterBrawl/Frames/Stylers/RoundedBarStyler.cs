@@ -10,7 +10,15 @@ namespace SorterBrawl.Frames.Stylers
 {
     class RoundedBarStyler : Styler
     {
-        public Color Background { get; set; } = Color.Black;
+        public Color Background
+        {
+            get => background;
+            set
+            {
+                background = value;
+                backgroundBrush = new SolidBrush(background);
+            }
+        }
 
         public Color EdgeColor { get; set; } = Color.Black;
 
@@ -18,10 +26,15 @@ namespace SorterBrawl.Frames.Stylers
 
         public int EdgeWidth { get; set; }
 
+        Color background;
+        SolidBrush backgroundBrush;
+
         public RoundedBarStyler(int radius = 25, int edgeWidth = 5)
         {
             Radius = radius;
             EdgeWidth = edgeWidth;
+
+            Background = Color.Black;
         }
 
         public RoundedBarStyler(Color noneColor, int radius = 25, int edgeWidth = 5)
@@ -29,6 +42,8 @@ namespace SorterBrawl.Frames.Stylers
         {
             Radius = radius;
             EdgeWidth = edgeWidth;
+
+            Background = Color.Black;
         }
 
         public RoundedBarStyler(Color noneColor, Color background, int radius = 25, int edgeWidth = 5)
@@ -51,10 +66,10 @@ namespace SorterBrawl.Frames.Stylers
             EdgeColor = edgeColor;
         }
 
-        public override void Clear(Graphics graphics)
+        public override void Clear(Graphics graphics, FrameProfile profile)
         {
             lock (graphics)
-                graphics.Clear(Background);
+                graphics.FillRectangle(backgroundBrush, profile.ViewBox);
         }
 
         public override void DrawElement(DrawData data)

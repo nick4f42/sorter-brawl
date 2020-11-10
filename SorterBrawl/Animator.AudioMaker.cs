@@ -97,20 +97,21 @@ namespace SorterBrawl
                 return FrameCount >= profile.NonBlankFramelimit;
             }
 
+            const int RIFF = 0x46464952;
+            const int WAVE = 0x45564157;
+            const int formatChunkSize = 16;
+            const int headerSize = 8;
+            const int format = 0x20746D66;
+            const short formatType = 1;
+            const short tracks = 1;
+            const short bitsPerSample = 16;
+            const int data = 0x61746164;
+            const int waveSize = 4;
+            const short frameSize = (short)(tracks * ((bitsPerSample + 7) / 8));
+            const int bytesPerSecond = SamplesPerSecond * frameSize;
+
             static List<byte> GetWavHeaderBytes(double duration)
             {
-                int RIFF = 0x46464952;
-                int WAVE = 0x45564157;
-                int formatChunkSize = 16;
-                int headerSize = 8;
-                int format = 0x20746D66;
-                short formatType = 1;
-                short tracks = 1;
-                short bitsPerSample = 16;
-                short frameSize = (short)(tracks * ((bitsPerSample + 7) / 8));
-                int bytesPerSecond = SamplesPerSecond * frameSize;
-                int waveSize = 4;
-                int data = 0x61746164;
                 int samples = (int)(SamplesPerSecond * duration);
                 int dataChunkSize = samples * frameSize;
                 int fileSize = waveSize + headerSize + formatChunkSize + headerSize + dataChunkSize;
